@@ -86,7 +86,7 @@ module Venice
       end
 
       def verify!(data, options = {})
-        client = Client.production
+        client = Client.default
 
         begin
           client.verify!(data, options)
