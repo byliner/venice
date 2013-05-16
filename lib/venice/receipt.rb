@@ -36,6 +36,9 @@ module Venice
     attr_accessor :latest_expired
 
     # For auto-renewable subscriptions, returns the date the subscription will expire
+    attr_reader :expires_date
+
+    # Convenience method for retrieving a date object for expires_date
     attr_reader :expires_at
 
     def initialize(attributes = {})
@@ -49,7 +52,10 @@ module Venice
       @bvrs = attributes['bvrs']
 
       # expires_date is in ms since the Epoch, Time.at expects seconds
-      @expires_at = Time.at(attributes['expires_date'].to_i / 1000) if attributes['expires_date']
+      if attributes['expires_date']
+        @expires_date = Integer(attributes['expires_date'])
+        @expires_at = Time.at(expires_date / 1000)
+      end
 
       if attributes['original_transaction_id'] || attributes['original_purchase_date']
         original_attributes = {
@@ -62,7 +68,7 @@ module Venice
     end
 
     def to_h
-      {
+      h = {
         :quantity => @quantity,
         :product_id => @product_id,
         :transaction_id => @transaction_id,
@@ -74,6 +80,8 @@ module Venice
         :bid => @bid,
         :bvrs => @bvrs
       }
+      h.merge(:expires_date => expires_date, :expires_at => expires_at) unless expires_date.nil?
+      h
     end
 
     def to_json
