@@ -80,7 +80,7 @@ module Venice
         :bid => @bid,
         :bvrs => @bvrs
       }
-      h.merge(:expires_date => expires_date, :expires_at => expires_at) unless expires_date.nil?
+      h[:expires_date] = expires_date unless expires_date.nil?
       h
     end
 
