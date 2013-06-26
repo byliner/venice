@@ -94,21 +94,23 @@ module Venice
       end
 
       def verify!(data, options = {})
-        client = Client.default
+        client = Client.production
 
         begin
           client.verify!(data, options)
         rescue => error
-          case error
-          when 21007
-            client = Client.development
-            retry
-          when 21008
-            client = Client.production
-            retry
-          else
-            raise error
+          if error.respond_to?(:status)
+            case error.status
+            when 21007
+              client = Client.development
+              retry
+            when 21008
+              client = Client.production
+              retry
+            end
           end
+
+          raise error
         end
       end
 
