@@ -21,17 +21,17 @@ module Venice
     attr_accessor :verification_url
     attr_writer :shared_secret
 
+    class BaseError < StandardError
+      attr_reader :status
+      def initialize(message, status)
+        super(message)
+        @status = status
+      end
+    end
+
     class << self
       def shared_secret=(shared_secret)
         @@_shared_secret = shared_secret
-      end
-
-      def default=(client)
-        @@_default = client
-      end
-
-      def default
-        @@_default || production
       end
 
       def development
@@ -71,7 +71,7 @@ module Venice
 
         return receipt
       else
-        raise (RECEIPT_VERIFICATION_ERRORS_BY_STATUS_CODE[status] || "Unknown Error: #{status}")
+        raise BaseError.new(RECEIPT_VERIFICATION_ERRORS_BY_STATUS_CODE[status] || "Unknown Error: #{status}", status)
       end
     end
 
